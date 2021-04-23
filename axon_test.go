@@ -1,11 +1,11 @@
-package ubot
+package axon
 
 import (
 	"reflect"
 	"testing"
 )
 
-func TestVAsInteger(t *testing.T) {
+func TestV_AsInteger(t *testing.T) {
 	var (
 		err   error
 		value int64

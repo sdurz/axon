@@ -1,4 +1,4 @@
-package ubot
+package axon
 
 import (
 	"errors"
