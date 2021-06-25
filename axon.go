@@ -77,32 +77,34 @@ type O map[string]interface{}
 // Get returns the path property as generic V
 func (o *O) Get(path string) (result V, err error) {
 	if path == "" {
-		return result, errors.New("empty path")
+		err = errors.New("empty path")
+		return
 	}
+
 	splits := strings.Split(path, ".")
 	nextProp := splits[0]
 	remainingProps := splits[1:]
-
-	var ok bool
 	if len(remainingProps) > 0 {
-		var nextVal interface{}
-		if nextVal, ok = (*o)[nextProp]; !ok {
+		nextMap, ok := (*o)[nextProp]
+		if !ok {
 			err = errors.New("trying to traverse path " + path + ", unknown property: " + nextProp)
-		} else {
-			var nextO O
-			if nextO, ok = nextVal.(map[string]interface{}); !ok {
-				err = errors.New("trying to traverse path " + path + ", not a O (map[string]interface{}): " + nextProp)
-			} else {
-				result, err = nextO.Get(strings.Join(remainingProps, "."))
-			}
+			return
 		}
+
+		var nextO O
+		nextO, ok = nextMap.(map[string]interface{})
+		if !ok {
+			err = errors.New("trying to traverse path " + path + ", not a map[string]interface{}: " + nextProp)
+			return
+		}
+		result, err = nextO.Get(strings.Join(remainingProps, "."))
 	} else {
-		var value interface{}
-		if value, ok = (*o)[nextProp]; !ok {
+		value, ok := (*o)[nextProp]
+		if !ok {
 			err = errors.New("unknown key: " + nextProp)
-		} else {
-			result = V{value}
+			return
 		}
+		result = V{value}
 	}
 	return
 }
